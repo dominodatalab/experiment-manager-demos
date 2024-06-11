@@ -8,11 +8,7 @@ from functools import reduce
 from operator import mul
 from typing import List
 
-import wandb
-from wandb import util
-from wandb.data_types import Node
 
-torch = None
 
 
 def nested_shape(array_or_tuple, seen=None):
