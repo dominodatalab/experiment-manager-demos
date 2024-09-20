@@ -101,7 +101,7 @@ class MyMLflowLoggerCallback(LoggerCallback):
         self.should_save_artifact = save_artifact
 
         self.mlflow_util = _MLflowLoggerUtil()
-        self.parent_run_id = ''
+        self.parent_run_id = tags["mlflow.parentRunId"]
         if ray.util.client.ray.is_connected():
             logger.warning(
                 "When using MLflowLoggerCallback with Ray Client, "
@@ -126,8 +126,8 @@ class MyMLflowLoggerCallback(LoggerCallback):
         if self.tags is None:
             # Create empty dictionary for tags if not given explicitly
             self.tags = {}
-        run = self.mlflow_util.start_run(tags=self.tags, run_name=f"root-{now_str}")
-        self.parent_run_id = run.info.run_id
+        #run = self.mlflow_util.start_run(tags=self.tags, run_name=f"root-{now_str}")
+        #self.parent_run_id = run.info.run_id
         self._trial_runs = {}
         ## Create an parent run here.
 
@@ -138,7 +138,7 @@ class MyMLflowLoggerCallback(LoggerCallback):
             # Set trial name in tags
             tags = self.tags.copy()
             tags["trial_name"] = str(trial)
-            tags["mlflow.parentRunId"] = self.parent_run_id 
+            #tags["mlflow.parentRunId"] = self.parent_run_id 
             run = self.mlflow_util.start_run(tags=tags, run_name=str(trial))
             self._trial_runs[trial] = run.info.run_id
 
@@ -165,4 +165,7 @@ class MyMLflowLoggerCallback(LoggerCallback):
         self.mlflow_util.end_run(run_id=run_id, status=status)
     
     def log_end_parent_run(self):
+        parent_run_id = self.parent_run_id
+        print(f'Now ending parent run {parent_run_id}')
         self.mlflow_util.end_run(run_id=self.parent_run_id, status="FINISHED")
+        return self.parent_run_id
